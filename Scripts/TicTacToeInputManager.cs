@@ -4,7 +4,7 @@ using UnityEngine;
 using Framework;
 
 // Sample implementation of the input controller system
-public class TicTacToeInputManager : IInputManager
+/*public class TicTacToeInputManager : IInputManager
 {
     private GameController _Controller;
 
@@ -27,4 +27,4 @@ public class TicTacToeInputManager : IInputManager
             }
         }
     }
-}
+}*/

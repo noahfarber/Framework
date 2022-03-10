@@ -7,23 +7,21 @@ using Framework;
 
 public class TicTacToeGameController : GameController
 {
-    [SerializeField] private TicTacToe TicTacToeGame;
-    [SerializeField] private SystemSounds SystemSoundData;
+    public TicTacToe TicTacToeGame;
+    public SystemSounds SystemSoundData;
 
-    public override void Init()
+    public override void Start()
     {
-        base.Init();
-        TicTacToeGame.Init();
-        SoundManager.Instance.PlayAndFade(SystemSoundData.MenuMusic, 1f, .25f, 0f);
+        base.Start();
+        TicTacToeGame.Build();
     }
 
     public override void StartGame()
     {
         SoundManager.Instance.Fade(SystemSoundData.MenuMusic, 0f, .5f);
-        SoundManager.Instance.PlayAndFade(SystemSoundData.GameMusic, 1f, .5f);
 
         TicTacToeGame.gameObject.SetActive(true);
-        TicTacToeGame.ResetGame();
+        TicTacToeGame.Init();
 
         base.StartGame();
     }
@@ -35,7 +33,7 @@ public class TicTacToeGameController : GameController
         {
             TicTacToeGame.UpdateGame();
         }
-        
+
         base.Update();
     }
 
@@ -64,13 +62,5 @@ public class TicTacToeGameController : GameController
         base.UnpauseGame();
     }
 
-}
-
-[System.Serializable]
-public class SystemSounds
-{
-    public AudioSource MenuMusic;
-    public AudioSource GameMusic;
-    public AudioSource PauseMusic;
 }
 

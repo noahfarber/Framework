@@ -7,32 +7,21 @@ using TMPro;
 
 public class TicTacToe : MonoBehaviour
 {
-    public enum GameState
-    {
-        PlayerTurn = 0,
-        ComputerTurn = 1,
-        GameOver = 2
-    }
-
     [SerializeField] private Button[] _TicTacToeTiles;
     [SerializeField] private TextMeshProUGUI _GameMessageText;
     [SerializeField] private TextMeshProUGUI _ScoreText;
-    [SerializeField] private Button _RestartButton;
     [SerializeField] private TicTacToeSounds GameSoundData;
 
-    private GameState State = GameState.PlayerTurn;
     private TextMeshProUGUI[] _TicTacToeTileTexts;
     private int[] _GameBoard = new int[9];
 
-    private int _EmptyTileID = -1;
-    private int _PlayerTileID = 1;
-    private int _ComputerTileID = 2;
+    public int EmptyTileID = -1;
+    public int PlayerTileID = 1;
+    public int ComputerTileID = 2;
 
     private int[][] _WinningCombinations;
     private int[] _WinningTiles = new int[3] { -1, -1, -1 };
 
-    private float _ComputerTurnCurrentTime = 0f;
-    private float _ComputerTurnDuration = 1f;
 
     private int _PlayerScore = 0;
     private int _ComputerScore = 0;
@@ -44,58 +33,50 @@ public class TicTacToe : MonoBehaviour
     private const string _StalemateMessage = "STALEMATE";
 
     #region Public Functions 
+    public void Build()
+    {
+    }
+
     public void Init()
     {
-        // Init player input buttons and save text references
-        _TicTacToeTileTexts = new TextMeshProUGUI[_TicTacToeTiles.Length];
-        for (int i = 0; i < _TicTacToeTiles.Length; i++)
-        {
-            int x = i;
-            _TicTacToeTiles[i].onClick.AddListener(delegate { TilePressed(x); });
-            _TicTacToeTileTexts[i] = _TicTacToeTiles[i].GetComponentInChildren<TextMeshProUGUI>();
-        }
-
-        _RestartButton.gameObject.SetActive(false);
-        _GameMessageText.text = _PlayerTurnMessage;
-        State = GameState.PlayerTurn;
-
-        InitWinningCombinations();
-    }
-
-    public void UpdateGame()
-    {
-        if (State == GameState.PlayerTurn)
-        {
-
-        }
-        if (State == GameState.ComputerTurn)
-        {
-            ComputerTurn();
-        }
-        if (State == GameState.GameOver)
-        {
-
-        }
-    }
-
-    public void ResetGame()
-    {
+        // Reset win tiles
         _WinningTiles = new int[3] { -1, -1, -1 };
+        InitWinningCombinations();
 
+        // Reset game board data
+        for (int i = 0; i < _GameBoard.Length; i++)
+        {
+            _GameBoard[i] = EmptyTileID;
+        }
+
+        // Reset gamme board texts
         for (int i = 0; i < _TicTacToeTileTexts.Length; i++)
         {
             _TicTacToeTileTexts[i].text = "";
             _TicTacToeTileTexts[i].color = Color.black;
         }
 
-        for (int i = 0; i < _GameBoard.Length; i++)
+        // Init player input buttons and save text references
+        _TicTacToeTileTexts = new TextMeshProUGUI[_TicTacToeTiles.Length];
+        for (int i = 0; i < _TicTacToeTiles.Length; i++)
         {
-            _GameBoard[i] = _EmptyTileID;
+            int x = i;
+
+            // Add tile behaviours if they don't exist
+            if(_TicTacToeTiles[i].onClick.GetPersistentEventCount() == 0)
+            {
+                _TicTacToeTiles[i].onClick.AddListener(delegate { TilePressed(x); });
+            }
+
+            // Get references to tile texts
+            if(_TicTacToeTileTexts[i] == null)
+            {
+                _TicTacToeTileTexts[i] = _TicTacToeTiles[i].GetComponentInChildren<TextMeshProUGUI>();
+            }
         }
 
-        _RestartButton.gameObject.SetActive(false);
+
         _GameMessageText.text = _PlayerTurnMessage;
-        State = GameState.PlayerTurn;
         SoundManager.Instance.PlayOneShot(GameSoundData.StartGame, 1f);
     }
     #endregion
@@ -103,61 +84,17 @@ public class TicTacToe : MonoBehaviour
     #region Private Functions
     private void InitWinningCombinations()
     {
-        _WinningCombinations = new int[8][];
-        _WinningCombinations[0] = new int[3] { 0, 1, 2 };
-        _WinningCombinations[1] = new int[3] { 3, 4, 5 };
-        _WinningCombinations[2] = new int[3] { 6, 7, 8 };
-        _WinningCombinations[3] = new int[3] { 0, 3, 6 };
-        _WinningCombinations[4] = new int[3] { 1, 4, 7 };
-        _WinningCombinations[5] = new int[3] { 2, 5, 8 };
-        _WinningCombinations[6] = new int[3] { 0, 4, 8 };
-        _WinningCombinations[7] = new int[3] { 2, 4, 6 };
-    }
-
-    private void ComputerTurn()
-    {
-        if (_ComputerTurnCurrentTime >= _ComputerTurnDuration)
+        if(_WinningCombinations == null)
         {
-            ComputerInput();
-        }
-        else
-        {
-            _ComputerTurnCurrentTime += Time.deltaTime;
-        }
-    }
-
-    private void ComputerInput()
-    {
-        int selection = ComputerStrategy();
-
-        // Random if no strategy found
-        if (selection == -1)
-        {
-            selection = Random.Range(0, _TicTacToeTiles.Length);
-
-            while (_GameBoard[selection] != _EmptyTileID)
-            {
-                selection = Random.Range(0, _TicTacToeTiles.Length);
-            }
-        }
-
-        UpdateGameBoard(selection, _ComputerTileID);
-
-        SoundManager.Instance.PlayOneShot(GameSoundData.ComputerTurn, 1f);
-
-        if (EvaluateWin(_ComputerTileID))
-        {
-            _ComputerScore++;
-            OnGameOver(_ComputerWinMessage);
-        }
-        else if (Stalemate())
-        {
-            OnGameOver(_StalemateMessage);
-        }
-        else
-        {
-            State = GameState.PlayerTurn;
-            _GameMessageText.text = _PlayerTurnMessage;
+            _WinningCombinations = new int[8][];
+            _WinningCombinations[0] = new int[3] { 0, 1, 2 };
+            _WinningCombinations[1] = new int[3] { 3, 4, 5 };
+            _WinningCombinations[2] = new int[3] { 6, 7, 8 };
+            _WinningCombinations[3] = new int[3] { 0, 3, 6 };
+            _WinningCombinations[4] = new int[3] { 1, 4, 7 };
+            _WinningCombinations[5] = new int[3] { 2, 5, 8 };
+            _WinningCombinations[6] = new int[3] { 0, 4, 8 };
+            _WinningCombinations[7] = new int[3] { 2, 4, 6 };
         }
     }
 
@@ -166,13 +103,13 @@ public class TicTacToe : MonoBehaviour
         if (State == GameState.PlayerTurn)
         {
             // If valid input
-            if (_GameBoard[selection] == _EmptyTileID)
+            if (_GameBoard[selection] == EmptyTileID)
             {
-                UpdateGameBoard(selection, _PlayerTileID);
+                UpdateBoard(selection, PlayerTileID);
 
                 SoundManager.Instance.PlayOneShot(GameSoundData.ClickedTile, 1f);
 
-                if (EvaluateWin(_PlayerTileID))
+                if (EvaluateWin(PlayerTileID))
                 {
                     _PlayerScore++;
                     OnGameOver(_PlayerWinMessage);
@@ -183,8 +120,6 @@ public class TicTacToe : MonoBehaviour
                 }
                 else
                 {
-                    _ComputerTurnCurrentTime = 0f;
-                    _ComputerTurnDuration = Random.Range(.25f, 1.25f);
                     State = GameState.ComputerTurn;
                     _GameMessageText.text = _ComputerTurnMessage;
                 }
@@ -227,10 +162,10 @@ public class TicTacToe : MonoBehaviour
         }
     }
 
-    private void UpdateGameBoard(int selection, int playerID)
+    public void UpdateBoard(int selection, int playerID)
     {
         _GameBoard[selection] = playerID;
-        _TicTacToeTileTexts[selection].text = playerID == _PlayerTileID ? "X" : "O";
+        _TicTacToeTileTexts[selection].text = playerID == PlayerTileID ? "X" : "O";
     }
     #endregion
 
@@ -240,7 +175,7 @@ public class TicTacToe : MonoBehaviour
     {
         for (int i = 0; i < _GameBoard.Length; i++)
         {
-            if (_GameBoard[i] == _EmptyTileID)
+            if (_GameBoard[i] == EmptyTileID)
             {
                 return false;
             }
@@ -249,8 +184,10 @@ public class TicTacToe : MonoBehaviour
         return true;
     }
 
-    private int ComputerStrategy()
+    public int ComputerStrategy()
     {
+        int rtn = -1;
+
         int winningTilePosition= -1;
         int defensiveTilePosition = -1;
 
@@ -263,15 +200,15 @@ public class TicTacToe : MonoBehaviour
             // Check each winning combination and evaluate
             for (int i = 0; i < _WinningCombinations[c].Length; i++)
             {
-                if (_GameBoard[_WinningCombinations[c][i]] == _PlayerTileID)
+                if (_GameBoard[_WinningCombinations[c][i]] == PlayerTileID)
                 {
                     numPlayerTiles++;
                 }
-                else if (_GameBoard[_WinningCombinations[c][i]] == _ComputerTileID)
+                else if (_GameBoard[_WinningCombinations[c][i]] == ComputerTileID)
                 {
                     numComputerTiles++;
                 }
-                else if(_GameBoard[_WinningCombinations[c][i]] == _EmptyTileID)
+                else if(_GameBoard[_WinningCombinations[c][i]] == EmptyTileID)
                 {
                     emptyTilePosition = _WinningCombinations[c][i];
                 }
@@ -291,26 +228,37 @@ public class TicTacToe : MonoBehaviour
         // If a win exists, sieze it!
         if (winningTilePosition != -1)
         {
-            return winningTilePosition;
+            rtn = winningTilePosition;
         }
         // If player will win, block it!
         else if (defensiveTilePosition != -1)
         {
-            return defensiveTilePosition;
+            rtn = defensiveTilePosition;
         }
         // If middle tile isn't taken, take it!
-        else if (_GameBoard[4] == _EmptyTileID)
+        else if (_GameBoard[4] == EmptyTileID)
         {
-            return 4;
+            rtn = 4;
         }
         // No strategy found
         else
         {
-            return -1;
+            // Random if no strategy found
+            if (rtn == -1)
+            {
+                rtn = Random.Range(0, _TicTacToeTiles.Length);
+
+                while (_GameBoard[rtn] != EmptyTileID)
+                {
+                    rtn = Random.Range(0, _TicTacToeTiles.Length);
+                }
+            }
         }
+        
+        return rtn;
     }
 
-    private bool EvaluateWin(int playerID)
+    public bool EvaluateWin(int playerID)
     {
         for (int c = 0; c < _WinningCombinations.Length; c++)
         {
