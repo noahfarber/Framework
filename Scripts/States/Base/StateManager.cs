@@ -1,29 +1,38 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Framework;
 
-public class StateManager : MonoBehaviour
+namespace Framework
 {
-    [SerializeField] private State DefaultState;
-    [HideInInspector] public State CurrentState;
-
-    public void Init()
+    public class StateManager : MonoBehaviour
     {
-        if (DefaultState != null) { StateChange(DefaultState); }
-    }
+        [SerializeField] private State DefaultState;
+        [HideInInspector] public State CurrentState;
 
-    public void ProcessStates()
-    {
-        if(CurrentState != null)
+        public void Init()
         {
-            CurrentState.OnUpdate();
+            if (DefaultState != null) { StateChange(DefaultState); }
         }
-    }
 
-    public void StateChange(State toState)
-    {
-        if(CurrentState != null) { CurrentState.OnStateExit(); } // Exit previous state //
-        CurrentState = toState; // Update current state to given state //
-        CurrentState.OnStateEnter(); // Process current state enter //
+        public void ProcessStates()
+        {
+            if (CurrentState != null)
+            {
+                State UpdatedState = CurrentState.OnUpdate();
+
+                if(UpdatedState != CurrentState)
+                {
+                    StateChange(UpdatedState);
+                }
+            }
+        }
+
+        public void StateChange(State toState)
+        {
+            if (CurrentState != null) { CurrentState.OnStateExit(); } // Exit previous state //
+            CurrentState = toState; // Update current state to given state //
+            CurrentState.OnStateEnter(); // Process current state enter //
+        }
     }
 }

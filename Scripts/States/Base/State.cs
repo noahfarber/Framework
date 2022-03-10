@@ -7,7 +7,7 @@ namespace Framework
     public abstract class State : MonoBehaviour
     {
         public abstract void OnStateEnter();
-        public abstract void OnUpdate();
+        public abstract State OnUpdate();
         public abstract void OnStateExit();
     }
 }

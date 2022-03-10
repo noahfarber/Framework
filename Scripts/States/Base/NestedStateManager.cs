@@ -10,14 +10,17 @@ namespace Framework
         [SerializeField] private State DefaultState;
         [HideInInspector] public State CurrentState;
 
+        #region State Functions
         public override void OnStateEnter()
         {
             if (DefaultState != null) { StateChange(DefaultState); }
+            CanExit = false;
         }
 
-        public override void OnUpdate()
+        public override State OnUpdate()
         {
             ProcessStates();
+            return CurrentState;
         }
 
         public override void OnStateExit()
@@ -25,13 +28,20 @@ namespace Framework
 
         }
 
-        public virtual void ProcessStates()
+        #region State Machine Functions
+        public void ProcessStates()
         {
             if (CurrentState != null)
             {
-                CurrentState.OnUpdate();
+                State UpdatedState = CurrentState.OnUpdate();
+
+                if (UpdatedState != CurrentState)
+                {
+                    StateChange(UpdatedState);
+                }
             }
         }
+        #endregion
 
         public virtual void StateChange(State toState)
         {
@@ -39,5 +49,6 @@ namespace Framework
             CurrentState = toState; // Update current state to given state //
             CurrentState.OnStateEnter(); // Process current state enter //
         }
+        #endregion
     }
 }

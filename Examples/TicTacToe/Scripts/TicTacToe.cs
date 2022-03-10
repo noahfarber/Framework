@@ -7,10 +7,19 @@ using TMPro;
 
 public class TicTacToe : MonoBehaviour
 {
-    [SerializeField] private Button[] _TicTacToeTiles;
+    public TicTacToeSounds GameSoundData;
+
+    public string PlayerTurnMessage = "PLAYER TURN";
+    public string PlayerWinMessage = "YOU WIN!!!";
+    public string ComputerTurnMessage = "COMPUTER TURN";
+    public string ComputerWinMessage = "COMPUTER WON :(";
+    public string StalemateMessage = "STALEMATE";
+    
+    public event System.Action<int> PlayerTilePressed;
+
     [SerializeField] private TextMeshProUGUI _GameMessageText;
+    [SerializeField] private Button[] _TicTacToeTiles;
     [SerializeField] private TextMeshProUGUI _ScoreText;
-    [SerializeField] private TicTacToeSounds GameSoundData;
 
     private TextMeshProUGUI[] _TicTacToeTileTexts;
     private int[] _GameBoard = new int[9];
@@ -19,18 +28,12 @@ public class TicTacToe : MonoBehaviour
     public int PlayerTileID = 1;
     public int ComputerTileID = 2;
 
-    private int[][] _WinningCombinations;
-    private int[] _WinningTiles = new int[3] { -1, -1, -1 };
-
-
     private int _PlayerScore = 0;
     private int _ComputerScore = 0;
 
-    private const string _PlayerTurnMessage = "PLAYER TURN";
-    private const string _PlayerWinMessage = "YOU WIN!!!";
-    private const string _ComputerTurnMessage = "COMPUTER TURN";
-    private const string _ComputerWinMessage = "COMPUTER WON :(";
-    private const string _StalemateMessage = "STALEMATE";
+    private int[][] _WinningCombinations;
+    private int[] _WinningTiles = new int[3] { -1, -1, -1 };
+
 
     #region Public Functions 
     public void Build()
@@ -76,7 +79,7 @@ public class TicTacToe : MonoBehaviour
         }
 
 
-        _GameMessageText.text = _PlayerTurnMessage;
+        _GameMessageText.text = PlayerTurnMessage;
         SoundManager.Instance.PlayOneShot(GameSoundData.StartGame, 1f);
     }
     #endregion
@@ -100,34 +103,15 @@ public class TicTacToe : MonoBehaviour
 
     private void TilePressed(int selection)
     {
-        if (State == GameState.PlayerTurn)
-        {
-            // If valid input
-            if (_GameBoard[selection] == EmptyTileID)
-            {
-                UpdateBoard(selection, PlayerTileID);
-
-                SoundManager.Instance.PlayOneShot(GameSoundData.ClickedTile, 1f);
-
-                if (EvaluateWin(PlayerTileID))
-                {
-                    _PlayerScore++;
-                    OnGameOver(_PlayerWinMessage);
-                }
-                else if (Stalemate())
-                {
-                    OnGameOver(_StalemateMessage);
-                }
-                else
-                {
-                    State = GameState.ComputerTurn;
-                    _GameMessageText.text = _ComputerTurnMessage;
-                }
-            }
-        }
+        PlayerTilePressed.Invoke(selection);
     }
 
-    private void OnGameOver(string gameOverMessage)
+    public void OnTurnOverMessage(string message)
+    {
+        _GameMessageText.text = message;
+    }
+
+    public void OnGameOver(string gameOverMessage)
     {
         // Set winning tiles green
         for (int i = 0; i < _WinningTiles.Length; i++)
@@ -140,23 +124,38 @@ public class TicTacToe : MonoBehaviour
 
         PlayGameOverSound(gameOverMessage);
 
+        if(gameOverMessage == PlayerWinMessage)
+        {
+            _PlayerScore++;
+        }
+        else if (gameOverMessage == ComputerWinMessage)
+        {
+            _ComputerScore++;
+        }
+        else if (gameOverMessage == StalemateMessage)
+        {
+
+        }
+        else
+        {
+            Debug.LogError($"Gave over condition not recognized: {gameOverMessage}");
+        }
+
         _GameMessageText.text = gameOverMessage;
         _ScoreText.text = "Player: " + _PlayerScore + "    Computer: " + _ComputerScore;
-        _RestartButton.gameObject.SetActive(true);
-        State = GameState.GameOver;
     }
 
     private void PlayGameOverSound(string gameOverMessage)
     {
-        if(gameOverMessage == _PlayerWinMessage)
+        if(gameOverMessage == PlayerWinMessage)
         {
             SoundManager.Instance.PlayOneShot(GameSoundData.WinGame, 1f);
         }
-        else if(gameOverMessage == _ComputerWinMessage)
+        else if(gameOverMessage == ComputerWinMessage)
         {
             SoundManager.Instance.PlayOneShot(GameSoundData.LoseGame, 1f);
         }
-        else if(gameOverMessage == _StalemateMessage)
+        else if(gameOverMessage == StalemateMessage)
         {
             SoundManager.Instance.PlayOneShot(GameSoundData.Stalemate, 1f);
         }
@@ -171,7 +170,7 @@ public class TicTacToe : MonoBehaviour
 
     #region Helper Functions
 
-    private bool Stalemate()
+    public bool IsStalemate()
     {
         for (int i = 0; i < _GameBoard.Length; i++)
         {

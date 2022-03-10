@@ -9,6 +9,9 @@ public class ComputerTurnState : State
     private float _ComputerTurnCurrentTime = 0f;
     private float _ComputerTurnDuration = 1f;
     [SerializeField] private AudioClip ComputerTurnSound;
+    [Space(30)]
+    [SerializeField] private PlayerTurnState PlayerTurn;
+    [SerializeField] private GameOverState GameOver;
 
     public override void OnStateEnter()
     {
@@ -16,16 +19,38 @@ public class ComputerTurnState : State
         _ComputerTurnDuration = Random.Range(.25f, 1.25f);
     }
 
-    public override void OnUpdate()
+    public override State OnUpdate()
     {
-        if (_ComputerTurnCurrentTime >= _ComputerTurnDuration)
+        State rtn = null;
+        if (_ComputerTurnCurrentTime >= _ComputerTurnDuration) // Wait for a second before making a move
         {
-            Input();
+            int selection = Game.ComputerStrategy();
+
+            Game.UpdateBoard(selection, Game.ComputerTileID);
+
+            SoundManager.Instance.PlayOneShot(Game.GameSoundData.ComputerTurn, 1f);
+
+            if (Game.EvaluateWin(Game.ComputerTileID))
+            {
+                Game.OnGameOver(Game.ComputerWinMessage);
+            }
+            else if (Game.IsStalemate())
+            {
+                rtn = GameOver;
+                Game.OnGameOver(Game.StalemateMessage);
+            }
+            else
+            {
+                rtn = PlayerTurn;
+                Game.OnTurnOverMessage(Game.PlayerTurnMessage);
+            }
         }
         else
         {
             _ComputerTurnCurrentTime += Time.deltaTime;
         }
+
+        return rtn;
     }
 
     public override void OnStateExit()
@@ -35,24 +60,6 @@ public class ComputerTurnState : State
 
     public void Input()
     {
-        int selection = Game.ComputerStrategy();
 
-        Game.UpdateBoard(selection, Game.ComputerTileID);
-
-        SoundManager.Instance.PlayOneShot(GameSoundData.ComputerTurn, 1f);
-
-        if (Game.EvaluateWin(Game.ComputerTileID))
-        {
-            _ComputerScore++;
-            OnGameOver(_ComputerWinMessage);
-        }
-        else if (Stalemate())
-        {
-            OnGameOver(_StalemateMessage);
-        }
-        else
-        {
-            _GameMessageText.text = _PlayerTurnMessage;
-        }
     }
 }
