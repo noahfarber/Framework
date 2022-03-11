@@ -22,32 +22,14 @@ public class ComputerTurnState : State
     public override State OnUpdate()
     {
         State rtn = null;
-        if (_ComputerTurnCurrentTime >= _ComputerTurnDuration) // Wait for a second before making a move
+        State exitCheck = null;
+
+        CheckForComputerInput();
+
+        exitCheck = CheckExitConditions();
+        if(exitCheck != null)
         {
-            int selection = Game.ComputerStrategy();
-
-            Game.UpdateBoard(selection, Game.ComputerTileID);
-
-            SoundManager.Instance.PlayOneShot(Game.GameSoundData.ComputerTurn, 1f);
-
-            if (Game.EvaluateWin(Game.ComputerTileID))
-            {
-                Game.OnGameOver(Game.ComputerWinMessage);
-            }
-            else if (Game.IsStalemate())
-            {
-                rtn = GameOver;
-                Game.OnGameOver(Game.StalemateMessage);
-            }
-            else
-            {
-                rtn = PlayerTurn;
-                Game.OnTurnOverMessage(Game.PlayerTurnMessage);
-            }
-        }
-        else
-        {
-            _ComputerTurnCurrentTime += Time.deltaTime;
+            rtn = exitCheck;
         }
 
         return rtn;
@@ -58,8 +40,38 @@ public class ComputerTurnState : State
 
     }
 
-    public void Input()
+    private void CheckForComputerInput()
     {
+        if (_ComputerTurnCurrentTime >= _ComputerTurnDuration) // Wait for a second before making a move
+        {
+            Game.UpdateBoard(Game.ComputerStrategy(), Game.ComputerTileID);
+        }
+        else
+        {
+            _ComputerTurnCurrentTime += Time.deltaTime;
+        }
+    }
 
+    private State CheckExitConditions()
+    {
+        State rtn = null;
+
+        if (Game.EvaluateWin(Game.ComputerTileID))
+        {
+            Game.OnGameOver(Game.ComputerWinMessage);
+            rtn = GameOver;
+        }
+        else if (Game.IsStalemate())
+        {
+            Game.OnGameOver(Game.StalemateMessage);
+            rtn = GameOver;
+        }
+        else
+        {
+            Game.OnTurnOverMessage(Game.PlayerTurnMessage);
+            rtn = PlayerTurn;
+        }
+
+        return rtn;
     }
 }

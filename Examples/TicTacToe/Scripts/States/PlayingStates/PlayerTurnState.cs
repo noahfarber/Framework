@@ -10,22 +10,25 @@ public class PlayerTurnState : State
     [SerializeField] private GameOverState GameOver;
     [SerializeField] private PausedState Paused;
 
-    private State NextState = null;
-
     public override void OnStateEnter()
     {
         Game.PlayerTilePressed += TilePressed;
-        NextState = null;
     }
 
     public override State OnUpdate()
     {
         State rtn = null;
-        if(Input.GetKeyDown(KeyCode.Escape))
+        State exitCheck = CheckExitConditions();
+
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
             rtn = Paused;
         }
-        if(NextState != null) { rtn = NextState; }
+        if(exitCheck != null)
+        {
+            rtn = exitCheck;
+        }
+
         return rtn;
     }
 
@@ -37,27 +40,29 @@ public class PlayerTurnState : State
     
     private void TilePressed(int selection)
     {
-        // If valid input
-        if (_GameBoard[selection] == EmptyTileID)
+        Game.CheckTilePressed(selection);
+    }
+
+    private State CheckExitConditions()
+    {
+        State rtn = null;
+
+        if (Game.EvaluateWin(Game.PlayerTileID))
         {
-            UpdateBoard(selection, PlayerTileID);
-
-            SoundManager.Instance.PlayOneShot(GameSoundData.ClickedTile, 1f);
-
-            if (EvaluateWin(PlayerTileID))
-            {
-                Game.OnGameOver(Game.ComputerWinMessage);
-            }
-            else if (Game.IsStalemate())
-            {
-                Game.OnGameOver(Game.StalemateMessage);
-                NextState = GameOver;
-            }
-            else
-            {
-                Game.GameMessageText.text = Game.ComputerTurnMessage;
-            }
+            Game.OnGameOver(Game.ComputerWinMessage);
+            rtn = GameOver;
+        }
+        else if (Game.IsStalemate())
+        {
+            Game.OnGameOver(Game.StalemateMessage);
+            rtn = GameOver;
+        }
+        else
+        {
+            Game.OnTurnOverMessage(Game.ComputerTurnMessage);
+            rtn = ComputerTurn;
         }
 
+        return rtn;
     }
 }

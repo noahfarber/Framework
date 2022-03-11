@@ -101,9 +101,25 @@ public class TicTacToe : MonoBehaviour
         }
     }
 
-    private void TilePressed(int selection)
+    public void TilePressed (int selection)
     {
         PlayerTilePressed.Invoke(selection);
+    }
+
+    public bool CheckTilePressed(int selection)
+    {
+        bool rtn = false;
+
+        PlayerTilePressed.Invoke(selection);
+
+        // If valid input
+        if (_GameBoard[selection] == EmptyTileID)
+        {
+            UpdateBoard(selection, PlayerTileID);
+            rtn = true; // A press was able to occur
+        }
+
+        return rtn;
     }
 
     public void OnTurnOverMessage(string message)
@@ -161,10 +177,11 @@ public class TicTacToe : MonoBehaviour
         }
     }
 
-    public void UpdateBoard(int selection, int playerID)
+    public void UpdateBoard(int selection, int ID)
     {
-        _GameBoard[selection] = playerID;
-        _TicTacToeTileTexts[selection].text = playerID == PlayerTileID ? "X" : "O";
+        _GameBoard[selection] = ID;
+        _TicTacToeTileTexts[selection].text = ID == PlayerTileID ? "X" : "O";
+        SoundManager.Instance.PlayOneShot(ID == PlayerTileID ? GameSoundData.ClickedTile : GameSoundData.ComputerTurn, 1f);
     }
     #endregion
 

@@ -9,6 +9,7 @@ namespace Framework
     {
         [SerializeField] private State DefaultState;
         [HideInInspector] public State CurrentState;
+        private bool CanExit = false;
 
         #region State Functions
         public override void OnStateEnter()
@@ -41,13 +42,14 @@ namespace Framework
                 }
             }
         }
-        #endregion
 
-        public virtual void StateChange(State toState)
+        public void StateChange(State toState)
         {
-            if (CurrentState != null) { CurrentState.OnStateExit(); } // Exit previous state //
+            if (CurrentState != null) { CurrentState.OnStateExit(); } // Exit previous state // 
+            Debugger.Instance.Log("State Exit: " + CurrentState.ToString());
             CurrentState = toState; // Update current state to given state //
             CurrentState.OnStateEnter(); // Process current state enter //
+            Debugger.Instance.Log("State Enter: " + CurrentState.ToString());
         }
         #endregion
     }
