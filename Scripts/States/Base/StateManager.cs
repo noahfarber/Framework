@@ -21,7 +21,7 @@ namespace Framework
             {
                 State UpdatedState = CurrentState.OnUpdate();
 
-                if(UpdatedState != CurrentState)
+                if(UpdatedState != null && UpdatedState != CurrentState)
                 {
                     StateChange(UpdatedState);
                 }
@@ -30,11 +30,17 @@ namespace Framework
 
         public void StateChange(State toState)
         {
-            if (CurrentState != null) { CurrentState.OnStateExit(); } // Exit previous state // 
-            Debugger.Instance.Log("State Exit: " + CurrentState.ToString());
+            if (CurrentState != null) 
+            {
+                // Exit previous state // 
+                Debugger.Instance.Log("State Exit: " + CurrentState.ToString());
+                CurrentState.OnStateExit();
+            } 
+
             CurrentState = toState; // Update current state to given state //
-            CurrentState.OnStateEnter(); // Process current state enter //
+
             Debugger.Instance.Log("State Enter: " + CurrentState.ToString());
+            CurrentState.OnStateEnter(); // Process current state enter //
         }
     }
 }
