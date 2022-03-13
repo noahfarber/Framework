@@ -23,5 +23,14 @@ namespace Framework
         {
             Application.Quit();
         }
+
+        private void Reset()
+        {
+            // Attach default references if applicable
+            if(GetComponent<StateManager>() != null)
+            {
+                StateManager = GetComponent<StateManager>();
+            }
+        }
     }
 }

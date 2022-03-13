@@ -43,6 +43,15 @@ namespace Framework
             Debugger.Instance.Log("State Enter: " + CurrentState.ToString());
             CurrentState.OnStateEnter(); // Process current state enter //
         }
+
+        private void Reset()
+        {
+            // Attach first state object by default
+            if (transform.GetChild(0).GetComponent<State>() != null)
+            {
+                DefaultState = transform.GetChild(0).GetComponent<State>();
+            }
+        }
         #endregion
 
 
