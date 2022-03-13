@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using System;
 using Framework;
@@ -43,32 +44,20 @@ public class Editor : MonoBehaviour
         }
 
         AssetDatabase.Refresh();
-    }
-/*
-    [MenuItem("Assets/Create/AddComponent %#q", false, 1)]
-    private static void AddStateClass()
-    {
-        GameObject selected = Selection.activeObject as GameObject;
 
-        if (selected == null || selected.name.Length == 0)
-        {
-            Debug.LogError("A GameObject must be selected to provide the state class name.");
-            return;
-        }
-
-        string copyFromPath = "Assets/Framework/Scripts/States/Base/ExampleState.cs";
-        Type type = AssetDatabase.GetMainAssetTypeAtPath(copyFromPath);
-        
+        // Adds new script to GameObject
+        var assembly = Assembly.Load("Assembly-CSharp");
+        var type = assembly.GetType("ExampleState");
 
         if (type != null)
         {
             Debug.Log(type.ToString());
-            selected.AddComponent("ExampleState");
+            selected.AddComponent(type);
             Debug.Log(selected.GetComponent<ExampleState>());
         }
         else
         {
             Debug.Log("none found");
         }
-    }*/
+    }
 }
