@@ -23,7 +23,7 @@ public class Editor : MonoBehaviour
         string fileName = selected.name.Replace(" ", "_").Replace("-", "_");
 
         string createPath = "Assets/" + fileName + ".cs";
-        string copyFromPath = "Assets/Framework/Scripts/Editor/ExampleState.cs";
+        string copyFromPath = "Assets/Framework/Scripts/States/Base/ExampleState.cs";
 
         if (File.Exists(createPath) == false)
         {
@@ -44,4 +44,31 @@ public class Editor : MonoBehaviour
 
         AssetDatabase.Refresh();
     }
+/*
+    [MenuItem("Assets/Create/AddComponent %#q", false, 1)]
+    private static void AddStateClass()
+    {
+        GameObject selected = Selection.activeObject as GameObject;
+
+        if (selected == null || selected.name.Length == 0)
+        {
+            Debug.LogError("A GameObject must be selected to provide the state class name.");
+            return;
+        }
+
+        string copyFromPath = "Assets/Framework/Scripts/States/Base/ExampleState.cs";
+        Type type = AssetDatabase.GetMainAssetTypeAtPath(copyFromPath);
+        
+
+        if (type != null)
+        {
+            Debug.Log(type.ToString());
+            selected.AddComponent("ExampleState");
+            Debug.Log(selected.GetComponent<ExampleState>());
+        }
+        else
+        {
+            Debug.Log("none found");
+        }
+    }*/
 }
