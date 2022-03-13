@@ -7,30 +7,15 @@ namespace Framework
 {
     public class NestedStateManager : State
     {
-        [SerializeField] private State DefaultState = null;
-        [HideInInspector] public State CurrentState = null;
-        private bool CanExit = false;
+        public State DefaultState;
+        [HideInInspector] public State CurrentState;
 
-        #region State Functions
-        public override void OnStateEnter()
+        #region State Manager Functions
+        public void Init()
         {
             if (DefaultState != null) { StateChange(DefaultState); }
-            CanExit = false;
         }
 
-        public override State OnUpdate()
-        {
-            ProcessStates();
-            return CurrentState;
-        }
-
-        public override void OnStateExit()
-        {
-            CurrentState.OnStateExit(); // Call exit for current state since leaving this state inherently means leaving the substate as well.
-        }
-        #endregion
-
-        #region State Machine Functions
         public void ProcessStates()
         {
             if (CurrentState != null)
@@ -59,5 +44,25 @@ namespace Framework
             CurrentState.OnStateEnter(); // Process current state enter //
         }
         #endregion
+
+
+        #region State Functions
+        public override void OnStateEnter()
+        {
+            Init();
+        }
+
+        public override State OnUpdate()
+        {
+            ProcessStates();
+            return CurrentState;
+        }
+
+        public override void OnStateExit()
+        {
+            CurrentState.OnStateExit(); // Call exit for current state since leaving this state inherently means leaving the substate as well.
+        }
+        #endregion
+
     }
 }
