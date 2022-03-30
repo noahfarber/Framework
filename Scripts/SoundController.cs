@@ -44,7 +44,10 @@ namespace Framework
             source.mute = false;
             source.Play();
 
-            _ActiveSources.Add(source); // Add one-shot source to active audio source pool.
+            if (!_ActiveSources.Contains(source))
+            {
+                _ActiveSources.Add(source); // Add one-shot source to active audio source pool.
+            }
         }
 
         //
@@ -69,7 +72,7 @@ namespace Framework
         {
             source.Stop();
 
-            if (!_ActiveSources.Contains(source))
+            if (_ActiveSources.Contains(source))
             {
                 _ActiveSources.Remove(source); // Add source to active audio source pool.
             }
