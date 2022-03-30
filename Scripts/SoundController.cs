@@ -177,6 +177,10 @@ namespace Framework
                 }
                 else
                 {
+                    // Apply final volume
+                    fadeInfo.Source.volume = fadeInfo.InitialVolume + fadeInfo.DeltaVolume;
+
+                    // Remove fade data
                     _FadeInformation.RemoveAt(index);
                 }
             }
