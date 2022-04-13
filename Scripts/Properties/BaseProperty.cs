@@ -6,7 +6,6 @@ using UnityEngine;
 public abstract class BaseProperty<ValueType>
 {
     bool _allowPropertyChange = true;
-    [Newtonsoft.Json.JsonIgnore]
     public bool AllowPropertyChanged 
     {
         get { return _allowPropertyChange; }

@@ -25,6 +25,7 @@ namespace Framework
                 if (UpdatedState != null && UpdatedState != CurrentState)
                 {
                     StateChange(UpdatedState);
+                    Central.GlobalData.Save();
                 }
             }
         }
@@ -40,8 +41,11 @@ namespace Framework
 
             CurrentState = toState; // Update current state to given state //
 
-            Debugger.Instance.Log("State Enter: " + CurrentState.ToString());
-            CurrentState.OnStateEnter(); // Process current state enter //
+            if (CurrentState != null)
+            {
+                Debugger.Instance.Log("State Enter: " + CurrentState.ToString());
+                CurrentState.OnStateEnter(); // Process current state enter //
+            }
         }
 
         private void Reset()
@@ -69,7 +73,7 @@ namespace Framework
 
         public override void OnStateExit()
         {
-            CurrentState.OnStateExit(); // Call exit for current state since leaving this state inherently means leaving the substate as well.
+            StateChange(null);
         }
         #endregion
 
