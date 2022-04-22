@@ -11,6 +11,7 @@ namespace Framework
         public TextMeshProUGUI ScreenLog;
         private string ScreenLogMsg = "";
 
+        public bool ShowOnScreen = false;
         public bool Logs = true;
         public bool Erorrs = true;
 
@@ -27,8 +28,7 @@ namespace Framework
             if (Logs)
             {
                 Debug.Log(message);
-                ScreenLogMsg += message + System.Environment.NewLine;
-                ScreenLog.text = ScreenLogMsg;
+                AddToInternalLog(message);
             }
         }
 
@@ -37,7 +37,16 @@ namespace Framework
             if (Erorrs)
             {
                 Debug.LogError(message);
-                ScreenLogMsg += message + System.Environment.NewLine;
+                AddToInternalLog(message);
+            }
+        }
+
+        private void AddToInternalLog(string message)
+        {
+            ScreenLogMsg += message + System.Environment.NewLine;
+
+            if (ShowOnScreen)
+            {
                 ScreenLog.text = ScreenLogMsg;
             }
         }
