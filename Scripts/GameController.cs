@@ -28,12 +28,6 @@ namespace Framework
             }
         }
 
-        public void AddMoney(int amount)
-        {
-            Central.GlobalData.Money.Value += amount;
-            PauseGame();
-        }
-
         public void PauseGame()
         {
             if (StateManager.CurrentState != _Paused)

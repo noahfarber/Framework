@@ -24,7 +24,6 @@ namespace Framework
                 if(UpdatedState != null && UpdatedState != CurrentState)
                 {
                     StateChange(UpdatedState);
-                    Central.GlobalData.Save();
                 }
             }
         }
