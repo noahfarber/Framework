@@ -17,7 +17,7 @@ namespace TicTacToe
         public override void OnStateEnter()
         {
             base.OnStateEnter();
-            SoundManager.Instance.PlayAndFade(_GameMusic, 1f, .5f);
+            SoundController.Instance.PlayAndFade(_GameMusic, 1f, .5f);
             _Game.gameObject.SetActive(true);
         }
 
@@ -39,7 +39,7 @@ namespace TicTacToe
         {
             base.OnStateExit();
             _Game.gameObject.SetActive(false);
-            SoundManager.Instance.Stop(_GameMusic);
+            SoundController.Instance.Stop(_GameMusic);
         }
 
         public void PauseGame()

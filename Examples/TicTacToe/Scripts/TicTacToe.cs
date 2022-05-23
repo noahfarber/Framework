@@ -83,7 +83,7 @@ namespace TicTacToe
             }
 
             _GameMessageText.text = PlayerTurnMessage;
-            SoundManager.Instance.PlayOneShot(GameSoundData.StartGame, 1f);
+            SoundController.Instance.PlayOneShot(GameSoundData.StartGame, 1f);
         }
         #endregion
 
@@ -166,15 +166,15 @@ namespace TicTacToe
         {
             if (gameOverMessage == PlayerWinMessage)
             {
-                SoundManager.Instance.PlayOneShot(GameSoundData.WinGame, 1f);
+                SoundController.Instance.PlayOneShot(GameSoundData.WinGame, 1f);
             }
             else if (gameOverMessage == ComputerWinMessage)
             {
-                SoundManager.Instance.PlayOneShot(GameSoundData.LoseGame, 1f);
+                SoundController.Instance.PlayOneShot(GameSoundData.LoseGame, 1f);
             }
             else if (gameOverMessage == StalemateMessage)
             {
-                SoundManager.Instance.PlayOneShot(GameSoundData.Stalemate, 1f);
+                SoundController.Instance.PlayOneShot(GameSoundData.Stalemate, 1f);
             }
         }
 
@@ -182,7 +182,7 @@ namespace TicTacToe
         {
             _GameBoard[selection] = ID;
             _TicTacToeTileTexts[selection].text = ID == PlayerTileID ? "X" : "O";
-            SoundManager.Instance.PlayOneShot(ID == PlayerTileID ? GameSoundData.ClickedTile : GameSoundData.ComputerTurn, 1f);
+            SoundController.Instance.PlayOneShot(ID == PlayerTileID ? GameSoundData.ClickedTile : GameSoundData.ComputerTurn, 1f);
         }
         #endregion
 

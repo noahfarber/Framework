@@ -5,27 +5,55 @@ namespace Framework
 {
     public class SoundController : MonoBehaviour
     {
-        // Master control
-        private List<AudioSource> _ActiveSources = new List<AudioSource>(); // Stores all audio sources currently playing a clip. Can be helpful for master audio control.
+        // TABLE OF CONTENTS (PUBLIC FUNCTIONS)
+        //
+        // 
+        // (- PlayOneShot -)
+        //     # Play a sound once WITHOUT a dedicated AudioSource
+        //
+        // (- Play -)
+        //     # Play an audio source.
+        //     # Using this function adds the source to the ActiveSources list so it can be used with master control.
+        //
+        // (- Stop -)
+        //     # Stops an AudioSource
+        //
+        // (- Fade -)
+        //     # Fades an AudioSource over X seconds with optional parameters.
+        //     # Only controls volume.
+        //
+        // (- PlayAndFade -)
+        //     # Plays and Fades an AudioSource over X seconds with optional parameters.
+        //
+        // (- StopFade -)
+        //     # Stop fading an AudioSource
+        //     
+        // (- FadeAllAudio -)
+        //     # Fades all audio to X volume (using the ActiveSources list)
+        //     
+        // (- ToggleMasterMute -)
+        //     # Toggle the mute option on all ActiveSources
+        // 
 
-        // One shot information
-        private int _OneShotSourcesCount = 10; // Number of one-shot sources to create and add to pool on game start.
+
+        // (REQUIRED) Add "using Framework;" to your script to access the SoundController
+        // (RECOMMENDED) Place the SoundController on it's own GameObject and name the object SoundController.
+        public static SoundController Instance; // Reference and use this script from anywhere using SoundController.Instance
+
+        private List<AudioSource> _ActiveSources = new List<AudioSource>(); // Stores all audio sources currently playing a clip. Useful for master control.
         private List<AudioSource> _OneShotSources = new List<AudioSource>(); // Stores generated one-shot sources.
-
-        // Fade information
         private List<FadeData> _FadeInformation = new List<FadeData>(); // Stores information for fading audio sources.
 
         #region UNITY FUNCTIONS
         private void Awake()
         {
             CreateOneShotSources(_OneShotSourcesCount); // Creates a pool of audio sources to use for one-shot calls.
-            SoundManager.Instance.Register(this); // Registers this controller with the SoundManager singleton
         }
 
         private void Update()
         {
-            UpdateActiveSources(); // Checks if active audio sources are still playing a clip.
-            ApplyFadeInformation(); // Applies volume changes to any fading audio sources.
+            UpdateActiveSources();
+            ApplyFadeInformation();
         }
         #endregion
 
@@ -34,12 +62,12 @@ namespace Framework
         //
         // Play any audio clip one time. Takes an AudioClip and (optionally) preferred volume.
         //
-        public void PlayOneShot(AudioClip clip, float volume = 1f) 
+        public void PlayOneShot(AudioClip clip, float volume = -1f) 
         {
             AudioSource source = GetOneShotAudioSource();
 
             source.clip = clip;
-            source.volume = volume;
+            source.volume = volume == -1f ? source.volume : volume;
             source.loop = false;
             source.mute = false;
             source.Play();
@@ -51,12 +79,12 @@ namespace Framework
         }
 
         //
-        // Play any audio source from SoundManager so that it may be added to ActiveSounds. 
+        // Play any audio source from SoundController so that it may be added to ActiveSounds. 
         //
         public void Play(AudioSource source, float volume = -1f)
         {
             source.mute = false;
-            source.Stop();
+            source.volume = volume == -1f ? source.volume : volume;
             source.Play();
 
             if (!_ActiveSources.Contains(source))
@@ -66,8 +94,7 @@ namespace Framework
         }
 
         //
-        // Play any audio source from SoundManager so that it may be added to ActiveSounds. 
-        //
+        // Play any audio source from SoundController so that it may be added to ActiveSounds. 
         public void Stop(AudioSource source)
         {
             source.Stop();
@@ -81,7 +108,7 @@ namespace Framework
         //
         // Fades an audio source with optional parameters
         //
-        public void Fade(AudioSource source, float targetVolume, float duration, float initialVolume)
+        public void Fade(AudioSource source, float targetVolume, float duration, float initialVolume = -1f)
         {
             initialVolume = initialVolume == -1f ? source.volume : initialVolume;
 
@@ -98,7 +125,7 @@ namespace Framework
         //
         // Plays and fades an audio source with optional parameters
         //
-        public void PlayAndFade(AudioSource source, float targetVolume, float duration, float initialVolume)
+        public void PlayAndFade(AudioSource source, float targetVolume, float duration, float initialVolume = -1f)
         {
             Play(source, initialVolume);
             Fade(source, targetVolume, duration, initialVolume);
@@ -145,7 +172,7 @@ namespace Framework
         #endregion
 
 
-        #region HELPER FUNCTIONS 
+        #region INTERNAL FUNCTIONS 
         //
         // Checks whether active sources are stil playing a clip, and removes them if they are not.
         //
@@ -207,7 +234,7 @@ namespace Framework
         #endregion
 
 
-        #region SETUP FUNCTIONS
+        #region INIT FUNCTIONS
         //
         // Creates a pool of audio sources for one-shot sounds to use
         //
@@ -255,6 +282,8 @@ namespace Framework
             return rtn;
         }
         #endregion
+
+        private int _OneShotSourcesCount = 10; // Number of one-shot sources to create and add to pool on game start.
     }
 
     //

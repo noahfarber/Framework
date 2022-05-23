@@ -14,8 +14,8 @@ namespace TicTacToe
         public override void OnStateEnter()
         {
             _PauseMenu.SetActive(true);
-            SoundManager.Instance.Fade(_GameMusic, 0f, .1f);
-            SoundManager.Instance.PlayAndFade(_PauseMusic, .5f, .1f, 0f);
+            SoundController.Instance.Fade(_GameMusic, 0f, .1f);
+            SoundController.Instance.PlayAndFade(_PauseMusic, .5f, .1f, 0f);
         }
 
         public override State OnUpdate()
@@ -27,8 +27,8 @@ namespace TicTacToe
         public override void OnStateExit()
         {
             _PauseMenu.SetActive(false);
-            SoundManager.Instance.Fade(_GameMusic, 1f, .25f);
-            SoundManager.Instance.Fade(_PauseMusic, 0f, 1f);
+            SoundController.Instance.Fade(_GameMusic, 1f, .25f);
+            SoundController.Instance.Fade(_PauseMusic, 0f, 1f);
         }
     }
 

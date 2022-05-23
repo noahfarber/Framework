@@ -22,7 +22,7 @@ namespace TicTacToe
             _StartGameRequested = false;
             _MainMenu.SetActive(true);
             _PauseMenu.SetActive(false);
-            SoundManager.Instance.PlayAndFade(_MenuMusic, 1f, .25f, 0f);
+            SoundController.Instance.PlayAndFade(_MenuMusic, 1f, .25f, 0f);
         }
 
         public override State OnUpdate()
@@ -41,7 +41,7 @@ namespace TicTacToe
         {
             _MainMenu.SetActive(false);
             _PauseMenu.SetActive(false);
-            SoundManager.Instance.Fade(_MenuMusic, 0f, .5f);
+            SoundController.Instance.Fade(_MenuMusic, 0f, .5f);
         }
 
         public void RequestStartGame()
