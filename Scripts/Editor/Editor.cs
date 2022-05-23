@@ -47,17 +47,11 @@ public class Editor : MonoBehaviour
 
         // Adds new script to GameObject
         var assembly = Assembly.Load("Assembly-CSharp");
-        var type = assembly.GetType("ExampleState");
+        var type = assembly.GetType(fileName);
 
         if (type != null)
         {
-            Debug.Log(type.ToString());
             selected.AddComponent(type);
-            Debug.Log(selected.GetComponent<ExampleState>());
-        }
-        else
-        {
-            Debug.Log("none found");
         }
     }
 }

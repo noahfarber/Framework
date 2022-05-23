@@ -9,6 +9,10 @@ namespace Framework
     {
         public StateManager StateManager;
 
+        [Header("Transition States")]
+        private State _StateBeforePause;
+        [SerializeField] private State _Paused;
+
         public virtual void Start()
         {
             StateManager.Init();
@@ -17,11 +21,36 @@ namespace Framework
         public virtual void Update()
         {
             StateManager.ProcessStates();
+
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                PauseGame();
+            }
+        }
+
+        public void PauseGame()
+        {
+            if (StateManager.CurrentState != _Paused)
+            {
+                _StateBeforePause = StateManager.CurrentState;
+                StateManager.StateChange(_Paused);
+            }
+            else if (StateManager.CurrentState == _Paused)
+            {
+                if (_StateBeforePause != null) { StateManager.StateChange(_StateBeforePause); }
+                else { Debugger.Instance.LogError("Can't unpause... No previous state found."); }
+            }
         }
 
         public virtual void ExitApplication()
         {
-            Application.Quit();
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#elif UNITY_WEBPLAYER
+         Application.OpenURL(webplayerQuitURL);
+#else
+         Application.Quit();
+#endif
         }
 
         private void Reset()
