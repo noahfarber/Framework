@@ -5,44 +5,44 @@ namespace Framework
 {
     public class SoundController : MonoBehaviour
     {
-        // TABLE OF CONTENTS (PUBLIC FUNCTIONS)
-        //
-        // 
-        // (- PlayOneShot -)
-        //     # Play a sound once WITHOUT a dedicated AudioSource
-        //
-        // (- Play -)
-        //     # Play an audio source.
-        //     # Using this function adds the source to the ActiveSources list so it can be used with master control.
-        //
-        // (- Stop -)
-        //     # Stops an AudioSource
-        //
-        // (- Fade -)
-        //     # Fades an AudioSource over X seconds with optional parameters.
-        //     # Only controls volume.
-        //
-        // (- PlayAndFade -)
-        //     # Plays and Fades an AudioSource over X seconds with optional parameters.
-        //
-        // (- StopFade -)
-        //     # Stop fading an AudioSource
-        //     
-        // (- FadeAllAudio -)
-        //     # Fades all audio to X volume (using the ActiveSources list)
-        //     
-        // (- ToggleMasterMute -)
-        //     # Toggle the mute option on all ActiveSources
-        // 
+        /// TABLE OF CONTENTS (PUBLIC FUNCTIONS)
+        ///
+        /// 
+        /// (- PlayOneShot -)
+        ///     # Play a sound once WITHOUT a dedicated AudioSource
+        ///
+        /// (- Play -)
+        ///     # Play an audio source.
+        ///     # Using this function adds the source to the ActiveSources list so it can be used with master control.
+        ///
+        /// (- Stop -)
+        ///     # Stops an AudioSource
+        ///
+        /// (- Fade -)
+        ///     # Fades an AudioSource over X seconds with optional parameters.
+        ///     # Only controls volume.
+        ///
+        /// (- PlayAndFade -)
+        ///     # Plays and Fades an AudioSource over X seconds with optional parameters.
+        ///
+        /// (- StopFade -)
+        ///     # Stop fading an AudioSource
+        ///     
+        /// (- FadeAllAudio -)
+        ///     # Fades all audio to X volume (using the ActiveSources list)
+        ///     
+        /// (- ToggleMasterMute -)
+        ///     # Toggle the mute option on all ActiveSources
+        /// 
 
 
-        // (REQUIRED) Add "using Framework;" to your script to access the SoundController
-        // (RECOMMENDED) Place the SoundController on it's own GameObject and name the object SoundController.
-        public static SoundController Instance; // Reference and use this script from anywhere using SoundController.Instance
+        /// (REQUIRED) Add "using Framework;" to your script to access the SoundController
+        /// (RECOMMENDED) Place the SoundController on it's own GameObject and name the object SoundController.
+        public static SoundController Instance; /// Reference and use this script from anywhere using SoundController.Instance
 
-        private List<AudioSource> _ActiveSources = new List<AudioSource>(); // Stores all audio sources currently playing a clip. Useful for master control.
-        private List<AudioSource> _OneShotSources = new List<AudioSource>(); // Stores generated one-shot sources.
-        private List<FadeData> _FadeInformation = new List<FadeData>(); // Stores information for fading audio sources.
+        private List<AudioSource> _ActiveSources = new List<AudioSource>(); /// Stores all audio sources currently playing a clip. Useful for master control.
+        private List<AudioSource> _OneShotSources = new List<AudioSource>(); /// Stores generated one-shot sources.
+        private List<FadeData> _FadeInformation = new List<FadeData>(); /// Stores information for fading audio sources.
 
         #region UNITY FUNCTIONS
         private void Awake()
@@ -59,10 +59,8 @@ namespace Framework
 
 
         #region PUBLIC CALLS
-        //
-        // Play any audio clip one time. Takes an AudioClip and (optionally) preferred volume.
-        //
-        public void PlayOneShot(AudioClip clip, float volume = -1f) 
+        /// <summary> Play any audio clip one time. Takes an AudioClip and (optionally) preferred volume. </summary>
+        public void PlayOneShot(AudioClip clip, float volume = -1f)
         {
             AudioSource source = GetOneShotAudioSource();
 
@@ -78,9 +76,7 @@ namespace Framework
             }
         }
 
-        //
-        // Play any audio source from SoundController so that it may be added to ActiveSounds. 
-        //
+        /// <summary> Play any audio source from SoundController so that it may be added to ActiveSounds. </summary>
         public void Play(AudioSource source, float volume = -1f)
         {
             source.mute = false;
@@ -93,8 +89,7 @@ namespace Framework
             }
         }
 
-        //
-        // Play any audio source from SoundController so that it may be added to ActiveSounds. 
+        /// <summary> Play any audio source from SoundController so that it may be added to ActiveSounds. </summary>
         public void Stop(AudioSource source)
         {
             source.Stop();
@@ -105,9 +100,7 @@ namespace Framework
             }
         }
 
-        //
-        // Fades an audio source with optional parameters
-        //
+        /// <summary> Fades an audio source with optional parameters. </summary>
         public void Fade(AudioSource source, float targetVolume, float duration, float initialVolume = -1f)
         {
             initialVolume = initialVolume == -1f ? source.volume : initialVolume;
@@ -122,18 +115,14 @@ namespace Framework
             }
         }
 
-        //
-        // Plays and fades an audio source with optional parameters
-        //
+        /// <summary> Plays and fades an audio source with optional parameters. </summary>
         public void PlayAndFade(AudioSource source, float targetVolume, float duration, float initialVolume = -1f)
         {
             Play(source, initialVolume);
             Fade(source, targetVolume, duration, initialVolume);
         }
 
-        //
-        // Stops a fade on target audio source by removing it from the fade information list
-        //
+        /// <summary> Stops a fade on target audio source by removing it from the fade information list. </summary>
         public void StopFade(AudioSource source, bool killVolume)
         {
             source.volume = killVolume ? 0f : source.volume;
@@ -148,9 +137,7 @@ namespace Framework
             }
         }
 
-        //
-        // Fades all active audio sources to a target volume in target amount of seconds
-        //
+        /// <summary> Fades all active audio sources to a target volume in target amount of seconds. </summary>
         public void FadeAllAudio(float volume, float duration, float startTime = 0f)
         {
             foreach (AudioSource source in _ActiveSources)
@@ -159,9 +146,7 @@ namespace Framework
             }
         }
 
-        //
-        // Enables or disables "mute" property on all audio sources
-        //
+        /// <summary> Enables or disables "mute" property on all audio sources. </summary>
         public void ToggleMasterMute(bool shouldMute)
         {
             foreach (AudioSource source in _ActiveSources)
@@ -173,10 +158,8 @@ namespace Framework
 
 
         #region INTERNAL FUNCTIONS 
-        //
-        // Checks whether active sources are stil playing a clip, and removes them if they are not.
-        //
-        private void UpdateActiveSources() 
+        /// <summary> Checks whether active sources are stil playing a clip, and removes them if they are not. </summary>
+        private void UpdateActiveSources()
         {
             for (int i = _ActiveSources.Count; i > 0; i--)
             {
@@ -188,10 +171,8 @@ namespace Framework
             }
         }
 
-        //
-        // Applies fade data to audio source and removes specific fade data from collection once a fade is complete.
-        //
-        private void ApplyFadeInformation() 
+        /// <summary> Applies fade data to audio source and removes specific fade data from collection once a fade is complete. </summary>
+        private void ApplyFadeInformation()
         {
             for (int i = _FadeInformation.Count; i > 0; i--)
             {
@@ -203,7 +184,7 @@ namespace Framework
                     fadeInfo.Source.volume = fadeInfo.InitialVolume + (fadeInfo.DeltaVolume * (fadeInfo.ElapsedTime / fadeInfo.Duration));
 
                     // Add to current elapsed time
-                    fadeInfo.ElapsedTime += Time.deltaTime; 
+                    fadeInfo.ElapsedTime += Time.deltaTime;
                 }
                 else
                 {
@@ -216,9 +197,7 @@ namespace Framework
             }
         }
 
-        //
-        // Checks and removes given audio source if it's a part of the active audio source list
-        //
+        /// <summary> Checks and removes given audio source if it's a part of the active audio source list. </summary>
         private void CheckToRemoveFadeSource(AudioSource source)
         {
             for (int i = _FadeInformation.Count; i > 0; i--)
@@ -235,9 +214,7 @@ namespace Framework
 
 
         #region INIT FUNCTIONS
-        //
-        // Creates a pool of audio sources for one-shot sounds to use
-        //
+        /// <summary> Creates a pool of audio sources for one-shot sounds to use. </summary>
         private void CreateOneShotSources(int count)
         {
             for (int i = 0; i < count; i++)
@@ -246,9 +223,7 @@ namespace Framework
             }
         }
 
-        //
-        // Creates and returns a new audio source attached to this script's GameObject
-        //
+        /// <summary> Creates and returns a new audio source attached to this script's GameObject. </summary>
         private AudioSource CreateAudioSource()
         {
             AudioSource newSource = gameObject.AddComponent<AudioSource>();
@@ -258,9 +233,7 @@ namespace Framework
             return newSource;
         }
 
-        //
-        // Gets an unused audio source for a one shot sound, or creates one if none are available
-        //
+        /// <summary> Gets an unused audio source for a one shot sound, or creates one if none are available. </summary>
         private AudioSource GetOneShotAudioSource()
         {
             AudioSource rtn = null;
@@ -273,7 +246,7 @@ namespace Framework
                 }
             }
 
-            if(rtn == null) // All sources are being used
+            if (rtn == null) // All sources are being used
             {
                 rtn = CreateAudioSource();
                 _OneShotSources.Add(rtn);
@@ -283,12 +256,10 @@ namespace Framework
         }
         #endregion
 
-        private int _OneShotSourcesCount = 10; // Number of one-shot sources to create and add to pool on game start.
+        private int _OneShotSourcesCount = 10; // Number of one-shot sources to create and add to pool on game start. </summary>
     }
 
-    //
-    // Data structure to store active fading information
-    //
+    /// <summary> Data structure to store active fading information. </summary>
     public class FadeData
     {
         public AudioSource Source;
